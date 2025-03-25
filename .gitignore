@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Secret Keys ###
+!**/src/main/resources/.env.properties
