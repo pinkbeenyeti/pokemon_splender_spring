@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import pokemon.splender.exception.handler.FilterExceptionHandler;
 import pokemon.splender.jwt.JwtAuthenticationFilter;
 import pokemon.splender.oauth.OAuth2AuthenticationSuccessHandler;
 import pokemon.splender.oauth.OAuth2UserService;
@@ -21,6 +22,7 @@ import pokemon.splender.oauth.OAuth2UserService;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final FilterExceptionHandler filterExceptionHandler;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2UserService oAuth2UserService;
 
@@ -42,7 +44,10 @@ public class SecurityConfig {
                     .userService(oAuth2UserService)
                 )
                 .successHandler(oAuth2AuthenticationSuccessHandler))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class) // JWT 인증을 처리하는 필터 적용
+            .addFilterBefore(filterExceptionHandler,
+                JwtAuthenticationFilter.class); // 필터에서 발생하는 예외를 처리하는 필터 적용
 
         return http.build();
     }
