@@ -22,6 +22,12 @@ public class AuthService {
         reissueRefreshToken(response, userId);
     }
 
+    public void logout(String refreshToken, HttpServletResponse response) {
+        validateToken(refreshToken);
+        Long userId = getUserId(refreshToken);
+        deleteRefreshTokenAndCookie(response, userId);
+    }
+
     // 유효한 토큰인지 확인
     private void validateToken(String refreshToken) {
         if (!jwtUtil.validateToken(refreshToken)) {
@@ -58,6 +64,14 @@ public class AuthService {
         response.addHeader("Set-Cookie", TokenCookieUtil.createAccessTokenCookie(newAccessToken).toString());
         response.addHeader("Set-Cookie", TokenCookieUtil.createRefreshTokenCookie(newRefreshToken).toString());
 
+    }
+
+    private void deleteRefreshTokenAndCookie(HttpServletResponse response, Long userId) {
+        // Redis에서 삭제
+        refreshTokenService.deleteRefreshToken(userId);
+
+        response.addHeader("Set-Cookie", TokenCookieUtil.deleteAccessTokenCookie().toString());
+        response.addHeader("Set-Cookie", TokenCookieUtil.deleteRefreshTokenCookie().toString());
     }
 
 }
