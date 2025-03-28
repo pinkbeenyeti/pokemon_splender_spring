@@ -78,4 +78,8 @@ public class JwtUtil {
             .getBody()
             .getSubject();
     }
+
+    public long getRefreshTokenExpiration() {
+        return jwtProperties.getRefreshTokenExpiration();
+    }
 }
