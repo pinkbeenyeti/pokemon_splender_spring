@@ -23,4 +23,13 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/api/logout")
+    public ResponseEntity<Void> logout(
+        @CookieValue("refresh_token") String refreshToken,
+        HttpServletResponse response
+    ) {
+        authService.logout(refreshToken, response);
+        return ResponseEntity.noContent().build();
+    }
+
 }
