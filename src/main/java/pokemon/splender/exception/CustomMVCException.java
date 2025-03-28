@@ -14,7 +14,7 @@ public class CustomMVCException extends RuntimeException {
     private final ErrorMessage errorMessage;
     private final HttpStatus status;
 
-    public static CustomFilterException invalidNameChangePeriod() {
-        return new CustomFilterException(INVALID_NAME_CHANGE_PERIOD, BAD_REQUEST);
+    public static CustomMVCException invalidNameChangePeriod() {
+        return new CustomMVCException(INVALID_NAME_CHANGE_PERIOD, BAD_REQUEST);
     }
 }
