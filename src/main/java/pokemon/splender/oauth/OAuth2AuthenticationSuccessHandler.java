@@ -15,6 +15,7 @@ import pokemon.splender.config.properties.OAuth2Properties;
 import pokemon.splender.exception.CustomException;
 import pokemon.splender.jwt.service.RefreshTokenService;
 import pokemon.splender.jwt.util.JwtUtil;
+import pokemon.splender.jwt.util.TokenCookieUtil;
 import pokemon.splender.user.entity.User;
 import pokemon.splender.user.service.UserService;
 
@@ -72,23 +73,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     private void setTokenCookies(HttpServletResponse response, String accessToken,
         String refreshToken) {
-        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", accessToken)
-            .httpOnly(true)
-            .secure(true)
-            .path("/") // 유효 경로 설정
-            .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
-            .maxAge(60 * 30)  // 30분
-            .build();
-
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
-            .httpOnly(true)
-            .secure(true)
-            .path("/") // 유효 경로 설정
-            .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
-            .maxAge(60 * 60 * 24 * 7)  // 7일
-            .build();
-
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        response.addHeader("Set-Cookie", TokenCookieUtil.createAccessTokenCookie(accessToken).toString());
+        response.addHeader("Set-Cookie", TokenCookieUtil.createRefreshTokenCookie(refreshToken).toString());
     }
 }
