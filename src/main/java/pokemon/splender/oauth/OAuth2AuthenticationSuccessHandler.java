@@ -13,7 +13,9 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import pokemon.splender.config.properties.OAuth2Properties;
 import pokemon.splender.exception.CustomException;
+import pokemon.splender.jwt.service.RefreshTokenService;
 import pokemon.splender.jwt.util.JwtUtil;
+import pokemon.splender.jwt.util.TokenCookieUtil;
 import pokemon.splender.user.entity.User;
 import pokemon.splender.user.service.UserService;
 
@@ -24,6 +26,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final JwtUtil jwtUtil;
     private final UserService userService;
     private final OAuth2Properties oAuth2Properties;
+    private final RefreshTokenService refreshTokenService;
 
     private String providerId, provider;
 
@@ -44,6 +47,10 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         // jwt 토큰 생성
         String accessToken = jwtUtil.createAccessToken(user.getId());
         String refreshToken = jwtUtil.createRefreshToken(user.getId());
+
+        // Redis에 Refresh Token 저장
+        long refreshTokenExpiration = jwtUtil.getRefreshTokenExpiration(); // Refresh Token 만료 시간
+        refreshTokenService.saveRefreshToken(user.getId(), refreshToken, refreshTokenExpiration); // Redis에 저장
 
         // 쿠키에 토큰 저장
         setTokenCookies(response, accessToken, refreshToken);
@@ -66,23 +73,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     private void setTokenCookies(HttpServletResponse response, String accessToken,
         String refreshToken) {
-        ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", accessToken)
-            .httpOnly(true)
-            .secure(true)
-            .path("/") // 유효 경로 설정
-            .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
-            .maxAge(60 * 30)  // 30분
-            .build();
-
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
-            .httpOnly(true)
-            .secure(true)
-            .path("/") // 유효 경로 설정
-            .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
-            .maxAge(60 * 60 * 24 * 7)  // 7일
-            .build();
-
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        response.addHeader("Set-Cookie", TokenCookieUtil.createAccessTokenCookie(accessToken).toString());
+        response.addHeader("Set-Cookie", TokenCookieUtil.createRefreshTokenCookie(refreshToken).toString());
     }
 }
