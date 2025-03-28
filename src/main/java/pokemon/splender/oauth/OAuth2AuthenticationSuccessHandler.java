@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import pokemon.splender.config.properties.OAuth2Properties;
-import pokemon.splender.exception.CustomException;
+import pokemon.splender.exception.CustomFilterException;
 import pokemon.splender.jwt.util.JwtUtil;
 import pokemon.splender.user.entity.User;
 import pokemon.splender.user.service.UserService;
@@ -26,6 +26,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final OAuth2Properties oAuth2Properties;
 
     private String providerId, provider;
+    private boolean newUser = false;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -39,7 +40,10 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         // 유저 확인 및 생성
         User user = userService.findByProviderIdAndProvider(providerId, provider)
-            .orElseGet(() -> userService.createUser(providerId, provider));
+            .orElseGet(() -> {
+                newUser = true; // 새로운 사용자일 경우 true
+                return userService.createUser(providerId, provider);
+            });
 
         // jwt 토큰 생성
         String accessToken = jwtUtil.createAccessToken(user.getId());
@@ -60,14 +64,14 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             providerId = attributes.get("id").toString();
             provider = "kakao";
         } else {
-            throw CustomException.invalidOAuthProviderException();  // 두 가지 모두 없을 경우
+            throw CustomFilterException.invalidOAuthProviderException();  // 두 가지 모두 없을 경우
         }
     }
 
     private void setTokenCookies(HttpServletResponse response, String accessToken,
         String refreshToken) {
         ResponseCookie accessTokenCookie = ResponseCookie.from("access_token", accessToken)
-            .httpOnly(true)
+            .httpOnly(true) // 클라이언트의 js에서 접근 불가
             .secure(true)
             .path("/") // 유효 경로 설정
             .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
@@ -75,14 +79,23 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             .build();
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
-            .httpOnly(true)
+            .httpOnly(true) // 클라이언트의 js에서 접근 불가
             .secure(true)
             .path("/") // 유효 경로 설정
             .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
             .maxAge(60 * 60 * 24 * 7)  // 7일
             .build();
 
+        ResponseCookie newUserCookie = ResponseCookie.from("new_user", String.valueOf(newUser))
+            .httpOnly(false) // 클라이언트의 js에서 접근 가능
+            .secure(true)
+            .path("/") // 유효 경로 설정
+            .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
+            .maxAge(60 * 60 * 24)  // 1일
+            .build();
+
         response.addHeader("Set-Cookie", accessTokenCookie.toString());
         response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        response.addHeader("Set-Cookie", newUserCookie.toString());
     }
 }

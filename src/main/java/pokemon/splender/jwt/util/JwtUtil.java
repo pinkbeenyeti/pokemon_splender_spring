@@ -10,7 +10,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pokemon.splender.config.properties.JwtProperties;
-import pokemon.splender.exception.CustomException;
+import pokemon.splender.exception.CustomFilterException;
 
 @Component
 @RequiredArgsConstructor
@@ -52,7 +52,7 @@ public class JwtUtil {
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
-            throw CustomException.invalidHeaderException();
+            throw CustomFilterException.invalidHeaderException();
         }
 
         return header.substring(7);
@@ -64,7 +64,7 @@ public class JwtUtil {
                 .parseClaimsJws(token); // 해당 코드에서 jwt 만료 시 ExpiredJwtException 발생
             return true;
         } catch (ExpiredJwtException e) {
-            throw CustomException.expiredTokenException();
+            throw CustomFilterException.expiredTokenException();
         } catch (Exception e) {
             return false;
         }

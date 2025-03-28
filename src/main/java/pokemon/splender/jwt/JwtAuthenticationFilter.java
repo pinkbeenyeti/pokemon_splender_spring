@@ -10,7 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import pokemon.splender.exception.CustomException;
+import pokemon.splender.exception.CustomFilterException;
 import pokemon.splender.jwt.util.JwtUtil;
 
 @Component
@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 userId, null, null);
             SecurityContextHolder.getContext().setAuthentication(auth);
         } else {
-            throw CustomException.invalidTokenException();
+            throw CustomFilterException.invalidTokenException();
         }
     }
 }
