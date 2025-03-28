@@ -24,4 +24,24 @@ public class TokenCookieUtil {
             .build();
     }
 
+    public static ResponseCookie deleteAccessTokenCookie() {
+        return ResponseCookie.from("access_token", "")
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .sameSite("Strict")
+            .maxAge(0) // 즉시 만료
+            .build();
+    }
+
+    public static ResponseCookie deleteRefreshTokenCookie() {
+        return ResponseCookie.from("refresh_token", "")
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .sameSite("Strict")
+            .maxAge(0) // 즉시 만료
+            .build();
+    }
+
 }
