@@ -24,6 +24,16 @@ public class TokenCookieUtil {
             .build();
     }
 
+    public static ResponseCookie newUserCookie(boolean newUser) {
+        return ResponseCookie.from("new_user", String.valueOf(newUser))
+            .httpOnly(false) // 클라이언트의 js에서 접근 가능
+            .secure(true)
+            .path("/") // 유효 경로 설정
+            .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
+            .maxAge(60 * 60 * 24)  // 1일
+            .build();
+    }
+
     public static ResponseCookie deleteAccessTokenCookie() {
         return ResponseCookie.from("access_token", "")
             .httpOnly(true)

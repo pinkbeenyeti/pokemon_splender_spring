@@ -5,7 +5,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import pokemon.splender.exception.CustomException;
+import pokemon.splender.exception.CustomFilterException;
 
 @Service
 public class OAuth2UserService extends DefaultOAuth2UserService {
@@ -16,7 +16,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         if (!attributes.containsKey("id") & !attributes.containsKey("sub")) {
-            throw CustomException.invalidOAuthFormatException();
+            throw CustomFilterException.invalidOAuthFormatException();
         }
         return oAuth2User;
     }

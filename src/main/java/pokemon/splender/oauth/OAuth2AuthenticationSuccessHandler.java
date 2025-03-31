@@ -6,13 +6,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import pokemon.splender.config.properties.OAuth2Properties;
-import pokemon.splender.exception.CustomException;
+import pokemon.splender.exception.CustomFilterException;
 import pokemon.splender.jwt.service.RefreshTokenService;
 import pokemon.splender.jwt.util.JwtUtil;
 import pokemon.splender.jwt.util.TokenCookieUtil;
@@ -29,6 +28,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final RefreshTokenService refreshTokenService;
 
     private String providerId, provider;
+    private boolean newUser = false;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -42,7 +42,10 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         // 유저 확인 및 생성
         User user = userService.findByProviderIdAndProvider(providerId, provider)
-            .orElseGet(() -> userService.createUser(providerId, provider));
+            .orElseGet(() -> {
+                newUser = true; // 새로운 사용자일 경우 true
+                return userService.createUser(providerId, provider);
+            });
 
         // jwt 토큰 생성
         String accessToken = jwtUtil.createAccessToken(user.getId());
@@ -67,7 +70,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             providerId = attributes.get("id").toString();
             provider = "kakao";
         } else {
-            throw CustomException.invalidOAuthProviderException();  // 두 가지 모두 없을 경우
+            throw CustomFilterException.invalidOAuthProviderException();  // 두 가지 모두 없을 경우
         }
     }
 
@@ -75,5 +78,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String refreshToken) {
         response.addHeader("Set-Cookie", TokenCookieUtil.createAccessTokenCookie(accessToken).toString());
         response.addHeader("Set-Cookie", TokenCookieUtil.createRefreshTokenCookie(refreshToken).toString());
+        response.addHeader("Set-Cookie", TokenCookieUtil.newUserCookie(newUser).toString());
     }
 }

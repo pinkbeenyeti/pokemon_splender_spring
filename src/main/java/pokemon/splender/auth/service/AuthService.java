@@ -3,7 +3,7 @@ package pokemon.splender.auth.service;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pokemon.splender.exception.CustomException;
+import pokemon.splender.exception.CustomFilterException;
 import pokemon.splender.jwt.service.RefreshTokenService;
 import pokemon.splender.jwt.util.JwtUtil;
 import pokemon.splender.jwt.util.TokenCookieUtil;
@@ -31,7 +31,7 @@ public class AuthService {
     // 유효한 토큰인지 확인
     private void validateToken(String refreshToken) {
         if (!jwtUtil.validateToken(refreshToken)) {
-            throw CustomException.expiredTokenException();
+            throw CustomFilterException.expiredTokenException();
         }
     }
 
@@ -50,7 +50,7 @@ public class AuthService {
             // 토큰 탈취 가능성이 있으므로
             // 저장된 토큰을 삭제 후 예외 던지기
             refreshTokenService.deleteRefreshToken(userId);
-            throw CustomException.invalidTokenException();
+            throw CustomFilterException.invalidTokenException();
         }
     }
 

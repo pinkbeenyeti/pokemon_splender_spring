@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pokemon.splender.exception.CustomException;
+import pokemon.splender.exception.CustomMVCException;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -59,7 +59,7 @@ public class User {
 
     public void updateName(String name) {
         if (!canChaneName(name)) {
-            throw CustomException.invalidNameChangePeriod();
+            throw CustomMVCException.invalidNameChangePeriod();
         } else {
             this.name = name;
             this.lastNameChangedAt = LocalDateTime.now();
