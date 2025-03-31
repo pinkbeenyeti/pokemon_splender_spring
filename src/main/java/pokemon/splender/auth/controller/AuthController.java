@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pokemon.splender.auth.service.AuthService;
+import pokemon.splender.response.CustomResponse;
+
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -20,7 +22,7 @@ public class AuthController {
         HttpServletResponse response
     ) {
         authService.reissueToken(refreshToken, response);
-        return ResponseEntity.noContent().build();
+        return CustomResponse.noContent();
     }
 
     @PostMapping("/api/logout")
@@ -29,7 +31,7 @@ public class AuthController {
         HttpServletResponse response
     ) {
         authService.logout(refreshToken, response);
-        return ResponseEntity.noContent().build();
+        return CustomResponse.noContent();
     }
 
 }
