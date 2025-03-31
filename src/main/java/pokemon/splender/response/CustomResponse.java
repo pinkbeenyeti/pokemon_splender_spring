@@ -8,4 +8,8 @@ public class CustomResponse {
     public static ResponseEntity<?> ok() {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    public static ResponseEntity<Void> noContent() {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
