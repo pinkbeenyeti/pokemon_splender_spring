@@ -4,11 +4,13 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static pokemon.splender.exception.ErrorMessage.EMPTY_COOKIES;
 import static pokemon.splender.exception.ErrorMessage.EXPIRED_TOKEN;
-import static pokemon.splender.exception.ErrorMessage.INVALID_HEADER;
 import static pokemon.splender.exception.ErrorMessage.INVALID_OAUTH_FORMAT;
 import static pokemon.splender.exception.ErrorMessage.INVALID_OAUTH_PROVIDER;
 import static pokemon.splender.exception.ErrorMessage.INVALID_TOKEN;
+import static pokemon.splender.exception.ErrorMessage.NOT_EXIST_ACCESS_COOKIE;
+import static pokemon.splender.exception.ErrorMessage.NOT_EXIST_REFRESH_COOKIE;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +23,16 @@ public class CustomFilterException extends RuntimeException {
     private final ErrorMessage errorMessage;
     private final HttpStatus status;
 
-    public static CustomFilterException invalidHeaderException() {
-        return new CustomFilterException(INVALID_HEADER, BAD_REQUEST);
+    public static CustomFilterException emptyCookiesException() {
+        return new CustomFilterException(EMPTY_COOKIES, BAD_REQUEST);
+    }
+
+    public static CustomFilterException notExistAccessTokenCookie() {
+        return new CustomFilterException(NOT_EXIST_ACCESS_COOKIE, BAD_REQUEST);
+    }
+
+    public static CustomFilterException notExistRefreshTokenCookie() {
+        return new CustomFilterException(NOT_EXIST_REFRESH_COOKIE, BAD_REQUEST);
     }
 
     public static CustomFilterException invalidOAuthFormatException() {

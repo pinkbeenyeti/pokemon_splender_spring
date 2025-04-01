@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 public enum ErrorMessage {
 
     //request 관련 문제
-    INVALID_HEADER(-10000, "유효하지 않은 헤더입니다."),
+    EMPTY_COOKIES(-10000, "쿠키가 비어있습니다."),
+    NOT_EXIST_ACCESS_COOKIE(-10001, "엑세스 토큰 쿠키가 존재하지 않습니다."),
+    NOT_EXIST_REFRESH_COOKIE(-10002, "리프레시 토큰 쿠키가 존재하지 않습니다."),
     INVALID_NAME_CHANGE_PERIOD(-10010, "이름을 변경한 지 30일이 지나지 않았습니다."),
 
     //oauth 인증 문제
@@ -21,7 +23,7 @@ public enum ErrorMessage {
     INVALID_TOKEN(-10200, "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN(-10201, "만료된 토큰입니다.");
 
-    
+
     private final int code;
     private final String message;
 }
