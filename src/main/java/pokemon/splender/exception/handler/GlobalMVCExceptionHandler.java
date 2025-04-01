@@ -11,6 +11,9 @@ public class GlobalMVCExceptionHandler {
 
     @ExceptionHandler(CustomMVCException.class)
     public ResponseEntity<ErrorMessage> handleCustomException(CustomMVCException customException) {
-        return new ResponseEntity<>(customException.getErrorMessage(), customException.getStatus());
+
+        return new ResponseEntity<>(
+            customException.getErrorMessage(),
+            customException.getStatus());
     }
 }

@@ -24,7 +24,7 @@ public class JwtUtil {
 
     public String createAccessToken(Long userId) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + 3600000); // 만료 시간을 1시간으로 설정
+        Date expiryDate = new Date(now.getTime() + jwtProperties.getAccessTokenExpiration());
 
         return Jwts.builder()
             .setSubject(String.valueOf(userId))
@@ -37,7 +37,7 @@ public class JwtUtil {
 
     public String createRefreshToken(Long userId) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + 604800000); // 만료 시간을 7일로 설정
+        Date expiryDate = new Date(now.getTime() + jwtProperties.getRefreshTokenExpiration());
 
         return Jwts.builder()
             .setSubject(String.valueOf(userId))
@@ -77,5 +77,9 @@ public class JwtUtil {
             .parseClaimsJws(token)
             .getBody()
             .getSubject();
+    }
+
+    public long getRefreshTokenExpiration() {
+        return jwtProperties.getRefreshTokenExpiration();
     }
 }
