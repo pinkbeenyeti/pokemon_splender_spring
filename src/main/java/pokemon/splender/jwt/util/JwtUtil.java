@@ -1,9 +1,11 @@
 package pokemon.splender.jwt.util;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
@@ -31,7 +33,7 @@ public class JwtUtil {
             .claim("tokenType", "access")
             .setIssuedAt(now)
             .setExpiration(expiryDate)
-            .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey()) // 명확한 서명 알고리즘과 키 사용
+            .signWith(SignatureAlgorithm.HS256, getSigningKey()) // 명확한 서명 알고리즘과 키 사용
             .compact();
     }
 
@@ -44,25 +46,46 @@ public class JwtUtil {
             .claim("tokenType", "refresh")
             .setIssuedAt(now)
             .setExpiration(expiryDate)
-            .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey()) // 명확한 서명 알고리즘과 키 사용
+            .signWith(SignatureAlgorithm.HS256, getSigningKey()) // 명확한 서명 알고리즘과 키 사용
             .compact();
     }
 
-    public String extractToken(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw CustomFilterException.invalidHeaderException();
+    public String extractAccessToken(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            throw CustomFilterException.emptyCookiesException();
         }
 
-        return header.substring(7);
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals("access_token")) {
+                return cookie.getValue();
+            }
+        }
+
+        throw CustomFilterException.notExistAccessTokenCookie();
+    }
+
+    public String extractRefreshToken(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            throw CustomFilterException.emptyCookiesException();
+        }
+
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals("refresh_token")) {
+                return cookie.getValue();
+            }
+        }
+
+        throw CustomFilterException.notExistAccessTokenCookie();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(getSigningKey()).build()
-                .parseClaimsJws(token); // 해당 코드에서 jwt 만료 시 ExpiredJwtException 발생
-            return true;
+            JwtParser jwtParser = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey()) // 서명 키 설정
+                .build();
+
+            jwtParser.parseClaimsJws(token); // 토큰을 파싱하여 검증
+            return true; // 검증 성공 토큰 만료 시 ExpiredJwtException 발생
         } catch (ExpiredJwtException e) {
             throw CustomFilterException.expiredTokenException();
         } catch (Exception e) {
@@ -73,7 +96,6 @@ public class JwtUtil {
     public String getSubject(String token) {
         return Jwts.parser()
             .setSigningKey(getSigningKey())
-            .build()
             .parseClaimsJws(token)
             .getBody()
             .getSubject();
