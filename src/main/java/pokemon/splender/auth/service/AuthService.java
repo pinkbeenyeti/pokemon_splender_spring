@@ -16,23 +16,18 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
 
     public void reissueToken(String refreshToken, HttpServletResponse response) {
-        validateToken(refreshToken);
+        // 유효한 토큰인지 확인
+        jwtUtil.validateToken(refreshToken);
         Long userId = getUserId(refreshToken);
         validateStoredToken(refreshToken, userId);
         reissueRefreshToken(response, userId);
     }
 
     public void logout(String refreshToken, HttpServletResponse response) {
-        validateToken(refreshToken);
+        // 유효한 토큰인지 확인
+        jwtUtil.validateToken(refreshToken);
         Long userId = getUserId(refreshToken);
         deleteRefreshTokenAndCookie(response, userId);
-    }
-
-    // 유효한 토큰인지 확인
-    private void validateToken(String refreshToken) {
-        if (!jwtUtil.validateToken(refreshToken)) {
-            throw CustomFilterException.expiredTokenException();
-        }
     }
 
     // 토큰에서 userId 추출
