@@ -75,7 +75,7 @@ public class JwtUtil {
             }
         }
 
-        throw CustomFilterException.notExistAccessTokenCookie();
+        throw CustomFilterException.notExistRefreshTokenCookie();
     }
 
     public boolean validateToken(String token) {
