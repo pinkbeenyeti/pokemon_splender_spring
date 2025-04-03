@@ -12,4 +12,8 @@ public class CustomResponse {
     public static ResponseEntity<Void> noContent() {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    public static <T> ResponseEntity<T> ok(T data) {
+        return ResponseEntity.status(HttpStatus.OK).body(data);
+    }
 }

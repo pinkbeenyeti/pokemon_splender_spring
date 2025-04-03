@@ -1,7 +1,9 @@
 package pokemon.splender.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static pokemon.splender.exception.ErrorMessage.INVALID_IMAGE;
 import static pokemon.splender.exception.ErrorMessage.INVALID_NAME_CHANGE_PERIOD;
+import static pokemon.splender.exception.ErrorMessage.NOT_EXIST_IMAGE;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +18,13 @@ public class CustomMVCException extends RuntimeException {
 
     public static CustomMVCException invalidNameChangePeriod() {
         return new CustomMVCException(INVALID_NAME_CHANGE_PERIOD, BAD_REQUEST);
+    }
+
+    public static CustomMVCException invalidImage() {
+        return new CustomMVCException(INVALID_IMAGE, BAD_REQUEST);
+    }
+
+    public static CustomMVCException notExistImage() {
+        return new CustomMVCException(NOT_EXIST_IMAGE, BAD_REQUEST);
     }
 }
