@@ -1,5 +1,6 @@
 package pokemon.splender.jwt.service;
 
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class RefreshTokenService {
     // Long expirationTime에 TTL 설정하면 됨
     public void saveRefreshToken(Long userId, String refreshToken, Long expirationTime) {
         String key = getRefreshTokenKey(userId);
-        redisTemplate.opsForValue().set(key, refreshToken, expirationTime);
+        redisTemplate.opsForValue().set(key, refreshToken, Duration.ofMillis(expirationTime));
     }
 
     // Redis에서 RefreshToken 값 조회
