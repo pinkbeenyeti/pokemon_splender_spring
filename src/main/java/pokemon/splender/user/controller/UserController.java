@@ -9,9 +9,5 @@ import pokemon.splender.response.CustomResponse;
 @RestController
 @RequestMapping("api/v1/user")
 public class UserController {
-
-    @GetMapping("/authenticated")
-    public ResponseEntity<?> getUserAuthenticated() {
-        return CustomResponse.ok();
-    }
+    
 }

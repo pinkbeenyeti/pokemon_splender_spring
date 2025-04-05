@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pokemon.splender.exception.CustomFilterException;
 import pokemon.splender.jwt.service.RefreshTokenService;
+import pokemon.splender.jwt.util.CookieUtil;
 import pokemon.splender.jwt.util.JwtUtil;
-import pokemon.splender.jwt.util.TokenCookieUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -53,11 +53,14 @@ public class AuthService {
         // 새로운 토큰 생성
         String newAccessToken = jwtUtil.createAccessToken(userId);
         String newRefreshToken = jwtUtil.createRefreshToken(userId);
-        refreshTokenService.saveRefreshToken(userId, newRefreshToken, jwtUtil.getRefreshTokenExpiration());
+        refreshTokenService.saveRefreshToken(userId, newRefreshToken,
+            jwtUtil.getRefreshTokenExpiration());
 
         // 쿠키 세팅
-        response.addHeader("Set-Cookie", TokenCookieUtil.createAccessTokenCookie(newAccessToken).toString());
-        response.addHeader("Set-Cookie", TokenCookieUtil.createRefreshTokenCookie(newRefreshToken).toString());
+        response.addHeader("Set-Cookie",
+            CookieUtil.createAccessTokenCookie(newAccessToken).toString());
+        response.addHeader("Set-Cookie",
+            CookieUtil.createRefreshTokenCookie(newRefreshToken).toString());
 
     }
 
@@ -65,8 +68,8 @@ public class AuthService {
         // Redis에서 삭제
         refreshTokenService.deleteRefreshToken(userId);
 
-        response.addHeader("Set-Cookie", TokenCookieUtil.deleteAccessTokenCookie().toString());
-        response.addHeader("Set-Cookie", TokenCookieUtil.deleteRefreshTokenCookie().toString());
+        response.addHeader("Set-Cookie", CookieUtil.deleteAccessTokenCookie().toString());
+        response.addHeader("Set-Cookie", CookieUtil.deleteRefreshTokenCookie().toString());
     }
 
 }

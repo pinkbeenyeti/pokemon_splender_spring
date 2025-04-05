@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
@@ -55,13 +54,7 @@ public class JwtUtil {
             throw CustomFilterException.emptyCookiesException();
         }
 
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals("access_token")) {
-                return cookie.getValue();
-            }
-        }
-
-        throw CustomFilterException.notExistAccessTokenCookie();
+        return CookieUtil.getCookieValue(request, "access_token");
     }
 
     public String extractRefreshToken(HttpServletRequest request) {
@@ -69,13 +62,7 @@ public class JwtUtil {
             throw CustomFilterException.emptyCookiesException();
         }
 
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals("refresh_token")) {
-                return cookie.getValue();
-            }
-        }
-
-        throw CustomFilterException.notExistRefreshTokenCookie();
+        return CookieUtil.getCookieValue(request, "refresh_token");
     }
 
     public boolean validateToken(String token) {

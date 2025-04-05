@@ -11,6 +11,7 @@ import static pokemon.splender.exception.ErrorMessage.INVALID_OAUTH_PROVIDER;
 import static pokemon.splender.exception.ErrorMessage.INVALID_TOKEN;
 import static pokemon.splender.exception.ErrorMessage.NOT_EXIST_ACCESS_COOKIE;
 import static pokemon.splender.exception.ErrorMessage.NOT_EXIST_REFRESH_COOKIE;
+import static pokemon.splender.exception.ErrorMessage.NOT_EXIST_THAT_COOKIE;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,10 @@ public class CustomFilterException extends RuntimeException {
 
     public static CustomFilterException notExistRefreshTokenCookie() {
         return new CustomFilterException(NOT_EXIST_REFRESH_COOKIE, BAD_REQUEST);
+    }
+
+    public static CustomFilterException notExistThatCookie() {
+        return new CustomFilterException(NOT_EXIST_THAT_COOKIE, BAD_REQUEST);
     }
 
     public static CustomFilterException invalidOAuthFormatException() {
