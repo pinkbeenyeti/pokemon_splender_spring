@@ -18,7 +18,7 @@ public class CookieUtil {
             }
         }
 
-        throw CustomFilterException.notExistRefreshTokenCookie();
+        throw CustomFilterException.notExistThatCookie();
     }
 
     public static ResponseCookie createAccessTokenCookie(String accessToken) {

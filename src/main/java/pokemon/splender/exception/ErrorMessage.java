@@ -13,6 +13,7 @@ public enum ErrorMessage {
     EMPTY_COOKIES(-10000, "쿠키가 비어있습니다."),
     NOT_EXIST_ACCESS_COOKIE(-10001, "엑세스 토큰 쿠키가 존재하지 않습니다."),
     NOT_EXIST_REFRESH_COOKIE(-10002, "리프레시 토큰 쿠키가 존재하지 않습니다."),
+    NOT_EXIST_THAT_COOKIE(-10003, "해당 쿠키가 존재하지 않습니다."),
     INVALID_NAME_CHANGE_PERIOD(-10010, "이름을 변경한 지 30일이 지나지 않았습니다."),
 
     //oauth 인증 문제
