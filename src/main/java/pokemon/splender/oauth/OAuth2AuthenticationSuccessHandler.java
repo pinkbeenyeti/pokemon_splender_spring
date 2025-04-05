@@ -101,7 +101,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         }
 
         String decoded = URLDecoder.decode(redirectUri, StandardCharsets.UTF_8);
-        System.out.println(decoded);
         if (decoded.equals(oAuth2Properties.getRedirectDevBasicUrl())) {
             return newUser ? oAuth2Properties.getRedirectDevNewUrl()
                 : oAuth2Properties.getRedirectDevMainUrl();
