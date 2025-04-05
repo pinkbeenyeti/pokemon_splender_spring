@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pokemon.splender.exception.CustomFilterException;
 import pokemon.splender.exception.ErrorMessage;
-import pokemon.splender.jwt.util.TokenCookieUtil;
+import pokemon.splender.jwt.util.CookieUtil;
 
 @Component
 @RequiredArgsConstructor
@@ -45,8 +45,8 @@ public class FilterExceptionHandler extends OncePerRequestFilter {
         // 만료된 토큰이거나 탈취된 토큰일 경우 쿠키 삭제
         if (ex.getStatus() == HttpStatus.FORBIDDEN
             || ex.getStatus() == HttpStatus.UNAUTHORIZED) {
-            response.addHeader("Set-Cookie", TokenCookieUtil.deleteAccessTokenCookie().toString());
-            response.addHeader("Set-Cookie", TokenCookieUtil.deleteRefreshTokenCookie().toString());
+            response.addHeader("Set-Cookie", CookieUtil.deleteAccessTokenCookie().toString());
+            response.addHeader("Set-Cookie", CookieUtil.deleteRefreshTokenCookie().toString());
         }
 
         // ObjectMapper를 사용하여 ErrorMessage를 JSON으로 변환
