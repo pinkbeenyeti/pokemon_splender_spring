@@ -1,14 +1,31 @@
 package pokemon.splender.jwt.util;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseCookie;
+import pokemon.splender.exception.CustomFilterException;
 
-public class TokenCookieUtil {
+public class CookieUtil {
+
+    public static String getCookieValue(HttpServletRequest request, String name) {
+        if (request.getCookies() == null) {
+            return null;
+        }
+
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals(name)) {
+                return cookie.getValue();
+            }
+        }
+
+        throw CustomFilterException.notExistRefreshTokenCookie();
+    }
 
     public static ResponseCookie createAccessTokenCookie(String accessToken) {
         return ResponseCookie.from("access_token", accessToken)
             .httpOnly(true)
             .secure(true)
-            .path("/") // 유효 경로 설정
+            .path("/api") // 유효 경로 설정
             .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
             .maxAge(60 * 30)  // 30분
             .build();
@@ -18,15 +35,15 @@ public class TokenCookieUtil {
         return ResponseCookie.from("refresh_token", refreshToken)
             .httpOnly(true)
             .secure(true)
-            .path("/") // 유효 경로 설정
+            .path("/api") // 유효 경로 설정
             .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
             .maxAge(60 * 60 * 24 * 7)  // 7일
             .build();
     }
 
-    public static ResponseCookie newUserCookie(boolean newUser) {
+    public static ResponseCookie createNewUserCookie(boolean newUser) {
         return ResponseCookie.from("new_user", String.valueOf(newUser))
-            .httpOnly(false) // 클라이언트의 js에서 접근 가능
+            .httpOnly(false)
             .secure(true)
             .path("/") // 유효 경로 설정
             .sameSite("Strict") // 다른 도메인에 요청 시 쿠키 포함 불가
