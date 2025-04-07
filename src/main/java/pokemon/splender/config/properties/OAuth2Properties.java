@@ -9,5 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 public class OAuth2Properties {
 
-    private String redirectDevUrl;
+    private String redirectDevBasicUrl;
+    private String redirectDevNewUrl;
+    private String redirectDevMainUrl;
 }
