@@ -50,4 +50,18 @@ public class ImageService {
         return result;
     }
 
+    public String getImagebyId(Long id) {
+        Image image = imageRepository.findById(id)
+            .orElseThrow(() -> CustomMVCException.notExistImage());
+
+        try {
+            Path path = Paths.get(image.getPath());
+            byte[] bytes = Files.readAllBytes(path);
+            String base64Image = Base64.getEncoder().encodeToString(bytes);
+            return base64Image;
+        } catch (IOException e) {
+            throw CustomMVCException.invalidImage(e.getMessage());
+        }
+    }
+
 }
