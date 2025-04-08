@@ -4,7 +4,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -13,8 +18,8 @@ import org.springframework.stereotype.Component;
 import pokemon.splender.config.properties.OAuth2Properties;
 import pokemon.splender.exception.CustomFilterException;
 import pokemon.splender.jwt.service.RefreshTokenService;
+import pokemon.splender.jwt.util.CookieUtil;
 import pokemon.splender.jwt.util.JwtUtil;
-import pokemon.splender.jwt.util.TokenCookieUtil;
 import pokemon.splender.user.entity.User;
 import pokemon.splender.user.service.UserService;
 
@@ -53,13 +58,18 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         // Redis에 Refresh Token 저장
         long refreshTokenExpiration = jwtUtil.getRefreshTokenExpiration(); // Refresh Token 만료 시간
-        refreshTokenService.saveRefreshToken(user.getId(), refreshToken, refreshTokenExpiration); // Redis에 저장
+        refreshTokenService.saveRefreshToken(user.getId(), refreshToken,
+            refreshTokenExpiration); // Redis에 저장
 
         // 쿠키에 토큰 저장
         setTokenCookies(response, accessToken, refreshToken);
 
+        // 리다이렉트를 위한 이전 path 확인
+        String cookieRedirectUri = CookieUtil.getCookieValue(request, "redirect_uri");
+        String redirectUri = getRedirectUri(cookieRedirectUri);
+
         // 리다이렉트
-        response.sendRedirect(oAuth2Properties.getRedirectDevUrl());
+        response.sendRedirect(redirectUri);
     }
 
     private void setOAuth2ProviderInfo(Map<String, Object> attributes) {
@@ -76,8 +86,38 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     private void setTokenCookies(HttpServletResponse response, String accessToken,
         String refreshToken) {
-        response.addHeader("Set-Cookie", TokenCookieUtil.createAccessTokenCookie(accessToken).toString());
-        response.addHeader("Set-Cookie", TokenCookieUtil.createRefreshTokenCookie(refreshToken).toString());
-        response.addHeader("Set-Cookie", TokenCookieUtil.newUserCookie(newUser).toString());
+        response.addHeader("Set-Cookie",
+            CookieUtil.createAccessTokenCookie(accessToken).toString());
+        response.addHeader("Set-Cookie",
+            CookieUtil.createRefreshTokenCookie(refreshToken).toString());
+        response.addHeader("Set-Cookie",
+            CookieUtil.createNewUserCookie(newUser).toString());
+    }
+
+    private String getRedirectUri(String redirectUri) {
+        if (redirectUri == null || redirectUri.isBlank()) {
+            return newUser ? oAuth2Properties.getRedirectDevNewUrl()
+                : oAuth2Properties.getRedirectDevMainUrl();
+        }
+
+        String decoded = URLDecoder.decode(redirectUri, StandardCharsets.UTF_8);
+        if (decoded.equals(oAuth2Properties.getRedirectDevBasicUrl())) {
+            return newUser ? oAuth2Properties.getRedirectDevNewUrl()
+                : oAuth2Properties.getRedirectDevMainUrl();
+        }
+
+        return isAllowedRedirectUri(decoded) ? decoded
+            : oAuth2Properties.getRedirectDevMainUrl();
+    }
+
+    private boolean isAllowedRedirectUri(String redirectUri) {
+        Set<String> allowedHosts = Set.of("localhost");
+
+        try {
+            return allowedHosts.contains(new URI(redirectUri).getHost());
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 }
+
