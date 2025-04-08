@@ -3,6 +3,8 @@ package pokemon.splender.image.service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -31,11 +33,11 @@ public class ImageService {
 
         for (Image image : images) {
             try {
-                // 이미지 경로로부터 File 객체 생성
-                File file = new File(image.getPath());
+                // 이미지 경로로부터 Path 객체 생성
+                Path path = Paths.get(image.getPath());
 
                 // 이미지 파일을 바이트 배열로 읽음
-                byte[] bytes = Files.readAllBytes(file.toPath());
+                byte[] bytes = Files.readAllBytes(path);
 
                 // 이미지를 Base64 문자열로 인코딩
                 String base64Image = Base64.getEncoder().encodeToString(bytes);
