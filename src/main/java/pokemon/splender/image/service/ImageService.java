@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import pokemon.splender.exception.CustomMVCException;
 import pokemon.splender.image.entity.Image;
@@ -20,6 +21,7 @@ import pokemon.splender.image.repository.ImageRepository;
 public class ImageService {
 
     private final ImageRepository imageRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public Map<Long, String> getImagesByIds(List<Long> ids) {
         // DB에서 이미지 경로 가져오기
@@ -61,6 +63,26 @@ public class ImageService {
             return base64Image;
         } catch (IOException e) {
             throw CustomMVCException.invalidImage(e.getMessage());
+        }
+    }
+
+    // Path별로 이미지를 찾은 후 Redis에 값 저장
+    // 키 값 예시 : "image:legend:86" -> legend 폴더 안의 첫번째
+    // 그룹으로 묶여있으므로 legend 그룹만 로딩 원할 시 "image:legend:*" 사용하면 된다.
+    public void cacheImageGroup(String group, String pathPrefix) {
+        List<Image> images = imageRepository.findAllByPathStartingWith(pathPrefix);
+
+        for (Image image : images) {
+            try {
+                Path path = Paths.get(image.getPath());
+                byte[] bytes = Files.readAllBytes(path);
+                String base64Image = Base64.getEncoder().encodeToString(bytes);
+
+                String redisKey = "image:" + group + ":" + image.getId();
+                redisTemplate.opsForValue().set(redisKey, base64Image);
+            } catch (IOException e) {
+                throw CustomMVCException.invalidImage(e.getMessage());
+            }
         }
     }
 
