@@ -44,7 +44,7 @@ public class ImageService {
 
                 result.put(image.getId(), base64Image);
             } catch (IOException e) {
-                throw CustomMVCException.invalidImage();
+                throw CustomMVCException.invalidImage(e.getMessage());
             }
         }
         return result;
