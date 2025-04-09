@@ -31,7 +31,7 @@ public class ImageController {
 
     @GetMapping("/profile/{userId}")
     public ResponseEntity<String> getProfileImage(@PathVariable Long userId) {
-        String image = imageService.getImagebyId(userId);
+        String image = imageService.getImageById(userId);
         return CustomResponse.ok(image);
     }
 
