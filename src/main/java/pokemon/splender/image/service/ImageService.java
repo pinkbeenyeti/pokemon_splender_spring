@@ -34,6 +34,11 @@ public class ImageService {
         Map<Long, String> result = new HashMap<>();
 
         for (Image image : images) {
+
+            if (image.getPath() == null || image.getPath().isBlank()) {
+                throw CustomMVCException.invalidImage("이미지 경로가 비어있습니다. imageId : " + image.getId());
+            }
+
             result.put(image.getId(),image.getPath());
         }
         return result;
@@ -42,6 +47,11 @@ public class ImageService {
     public String getImageById(Long id) {
         Image image = imageRepository.findById(id)
             .orElseThrow(() -> CustomMVCException.notExistImage());
+
+        if (image.getPath() == null || image.getPath().isBlank()) {
+            throw CustomMVCException.invalidImage("이미지 경로가 비어있습니다. imageId : " + image.getId());
+        }
+
         return image.getPath();
     }
 
@@ -51,7 +61,16 @@ public class ImageService {
     public void cacheImageGroup(String group, String pathPrefix) {
         List<Image> images = imageRepository.findAllByPathStartingWith(pathPrefix);
 
+        if (images.isEmpty()) {
+            throw CustomMVCException.notExistImage();
+        }
+
         for (Image image : images) {
+
+            if (image.getPath() == null || image.getPath().isBlank()) {
+                throw CustomMVCException.invalidImage("이미지 경로가 비어있습니다. imageId : " + image.getId());
+            }
+
             String redisKey = "image:" + group + ":" + image.getId();
             redisTemplate.opsForValue().set(redisKey, image.getPath());
         }
