@@ -34,20 +34,7 @@ public class ImageService {
         Map<Long, String> result = new HashMap<>();
 
         for (Image image : images) {
-            try {
-                // 이미지 경로로부터 Path 객체 생성
-                Path path = Paths.get(image.getPath());
-
-                // 이미지 파일을 바이트 배열로 읽음
-                byte[] bytes = Files.readAllBytes(path);
-
-                // 이미지를 Base64 문자열로 인코딩
-                String base64Image = Base64.getEncoder().encodeToString(bytes);
-
-                result.put(image.getId(), base64Image);
-            } catch (IOException e) {
-                throw CustomMVCException.invalidImage(e.getMessage());
-            }
+            result.put(image.getId(),image.getPath());
         }
         return result;
     }
@@ -55,15 +42,7 @@ public class ImageService {
     public String getImageById(Long id) {
         Image image = imageRepository.findById(id)
             .orElseThrow(() -> CustomMVCException.notExistImage());
-
-        try {
-            Path path = Paths.get(image.getPath());
-            byte[] bytes = Files.readAllBytes(path);
-            String base64Image = Base64.getEncoder().encodeToString(bytes);
-            return base64Image;
-        } catch (IOException e) {
-            throw CustomMVCException.invalidImage(e.getMessage());
-        }
+        return image.getPath();
     }
 
     // Path별로 이미지를 찾은 후 Redis에 값 저장
@@ -73,16 +52,8 @@ public class ImageService {
         List<Image> images = imageRepository.findAllByPathStartingWith(pathPrefix);
 
         for (Image image : images) {
-            try {
-                Path path = Paths.get(image.getPath());
-                byte[] bytes = Files.readAllBytes(path);
-                String base64Image = Base64.getEncoder().encodeToString(bytes);
-
-                String redisKey = "image:" + group + ":" + image.getId();
-                redisTemplate.opsForValue().set(redisKey, base64Image);
-            } catch (IOException e) {
-                throw CustomMVCException.invalidImage(e.getMessage());
-            }
+            String redisKey = "image:" + group + ":" + image.getId();
+            redisTemplate.opsForValue().set(redisKey, image.getPath());
         }
     }
 
