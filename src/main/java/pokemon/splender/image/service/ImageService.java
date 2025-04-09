@@ -52,7 +52,7 @@ public class ImageService {
         return result;
     }
 
-    public String getImagebyId(Long id) {
+    public String getImageById(Long id) {
         Image image = imageRepository.findById(id)
             .orElseThrow(() -> CustomMVCException.notExistImage());
 

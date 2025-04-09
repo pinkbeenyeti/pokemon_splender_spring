@@ -19,11 +19,11 @@ public class ImageCacheInitializer {
     // 프로그램 시작 시 캐싱
     @PostConstruct
     public void init() {
-        List<String> group = List.of(
+        List<String> groups = List.of(
             "level1", "level2", "level3", "back", "legend", "rare", "token"
         );
 
-        for (String groupName : group) {
+        for (String groupName : groups) {
             String pathPrefix = imageBasePath + groupName + "/";
             imageService.cacheImageGroup(groupName, pathPrefix);
         }
