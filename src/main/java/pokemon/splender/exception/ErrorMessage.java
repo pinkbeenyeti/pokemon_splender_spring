@@ -22,7 +22,13 @@ public enum ErrorMessage {
 
     //token 관련 문제
     INVALID_TOKEN(-10200, "유효하지 않은 토큰입니다."),
-    EXPIRED_TOKEN(-10201, "만료된 토큰입니다.");
+    EXPIRED_TOKEN(-10201, "만료된 토큰입니다."),
+
+
+    // image 관련 문제
+    INVALID_IMAGE(-10300, "유효하지 않은 이미지입니다."),
+    NOT_EXIST_IMAGE(-10301, "이미지가 존재하지 않습니다.");
+
 
 
     private final int code;
