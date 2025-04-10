@@ -14,6 +14,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pokemon.splender.exception.CustomMVCException;
+import pokemon.splender.user.util.NameValidator;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -58,15 +59,17 @@ public class User {
     }
 
     public void updateName(String name) {
-        if (!canChaneName(name)) {
+        if (!canChangeName()) {
             throw CustomMVCException.invalidNameChangePeriod();
-        } else {
-            this.name = name;
-            this.lastNameChangedAt = LocalDateTime.now();
         }
+
+        NameValidator.validate(name);
+
+        this.name = name;
+        this.lastNameChangedAt = LocalDateTime.now();
     }
 
-    private boolean canChaneName(String name) {
+    private boolean canChangeName() {
         return lastNameChangedAt.isBefore(LocalDateTime.now().minusDays(30));
     }
 
