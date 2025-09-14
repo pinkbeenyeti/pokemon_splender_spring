@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pokemon.splender.exception.CustomMVCException;
 import pokemon.splender.user.entity.User;
 import pokemon.splender.user.repository.UserRepository;
+import pokemon.splender.user.util.RandomStringGenerator;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +17,8 @@ public class UserService {
 
     @Transactional
     public User createUser(String providerId, String provider) {
-        User user = new User(providerId, provider);
+        String temporaryName = generateUniqueTemporaryName();
+        User user = new User(temporaryName, providerId, provider);
 
         return userRepository.save(user);
     }
@@ -35,6 +37,16 @@ public class UserService {
         }
 
         user.updateName(newUserName);
+        user.updateName(newUserName);
+    }
+
+    private String generateUniqueTemporaryName() {
+        while (true) {
+            String userName = RandomStringGenerator.generateRandomUserName();
+            if (!isDuplicatedName(userName)) {
+                return userName;
+            }
+        }
     }
 
     private boolean isDuplicatedName(String name) {
