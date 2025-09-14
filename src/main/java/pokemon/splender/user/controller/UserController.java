@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pokemon.splender.response.CustomResponse;
+import pokemon.splender.response.CustomApiResponse;
 import pokemon.splender.user.dto.UserNameEditRequest;
 import pokemon.splender.user.service.UserService;
 
@@ -26,6 +26,6 @@ public class UserController {
         Long userId = (Long) authentication.getPrincipal(); // userId 그대로 꺼내기
         userService.updateUserName(userId, request.newName());
 
-        return CustomResponse.ok();
+        return CustomApiResponse.ok();
     }
 }

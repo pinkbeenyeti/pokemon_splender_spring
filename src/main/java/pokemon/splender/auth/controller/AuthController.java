@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pokemon.splender.auth.service.AuthService;
-import pokemon.splender.response.CustomResponse;
+import pokemon.splender.response.CustomApiResponse;
 
 @RestController
 @RequestMapping("api/v1/auth")
@@ -21,7 +21,7 @@ public class AuthController {
 
     @GetMapping("/authenticated")
     public ResponseEntity<?> getAuthenticated() {
-        return CustomResponse.ok();
+        return CustomApiResponse.ok();
     }
 
     @PostMapping("/token/refresh")
@@ -30,7 +30,7 @@ public class AuthController {
         HttpServletResponse response
     ) {
         authService.reissueToken(refreshToken, response);
-        return CustomResponse.noContent();
+        return CustomApiResponse.noContent();
     }
 
     @PostMapping("/logout")
@@ -39,7 +39,7 @@ public class AuthController {
         HttpServletResponse response
     ) {
         authService.logout(refreshToken, response);
-        return CustomResponse.noContent();
+        return CustomApiResponse.noContent();
     }
 
 }
