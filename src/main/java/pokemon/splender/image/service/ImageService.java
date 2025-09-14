@@ -33,14 +33,14 @@ public class ImageService {
                 throw CustomMVCException.invalidImage("이미지 경로가 비어있습니다. imageId : " + image.getId());
             }
 
-            result.put(image.getId(),image.getPath());
+            result.put(image.getId(), image.getPath());
         }
         return result;
     }
 
     public String getImageById(Long id) {
         Image image = imageRepository.findById(id)
-            .orElseThrow(() -> CustomMVCException.notExistImage());
+            .orElseThrow(CustomMVCException::notExistImage);
 
         if (image.getPath() == null || image.getPath().isBlank()) {
             throw CustomMVCException.invalidImage("이미지 경로가 비어있습니다. imageId : " + image.getId());
