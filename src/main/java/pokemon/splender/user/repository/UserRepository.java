@@ -9,4 +9,6 @@ import pokemon.splender.user.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByProviderIdAndProvider(String providerId, String provider);
+
+    Optional<User> findByName(String name);
 }

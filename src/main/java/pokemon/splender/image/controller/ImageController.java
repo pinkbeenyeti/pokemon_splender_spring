@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pokemon.splender.image.service.ImageService;
-import pokemon.splender.response.CustomResponse;
+import pokemon.splender.response.CustomApiResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,13 +25,13 @@ public class ImageController {
         @RequestBody List<Long> ids
     ) {
         Map<Long, String> imageMap = imageService.getImagesByIds(ids);
-        return CustomResponse.ok(imageMap);
+        return CustomApiResponse.ok(imageMap);
     }
 
     @GetMapping("/profile/{userId}")
     public ResponseEntity<String> getProfileImage(@PathVariable Long userId) {
         String image = imageService.getImageById(userId);
-        return CustomResponse.ok(image);
+        return CustomApiResponse.ok(image);
     }
 
 }
